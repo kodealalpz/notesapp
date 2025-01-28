@@ -25,8 +25,11 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Group> groups;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Storage> images;
 
     public Integer getId() {
         return id;
@@ -98,5 +101,13 @@ public class User {
 
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    public List<Storage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Storage> images) {
+        this.images = images;
     }
 }
