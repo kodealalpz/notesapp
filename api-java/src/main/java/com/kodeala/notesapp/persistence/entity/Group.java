@@ -34,7 +34,7 @@ public class Group {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group")
     private List<Task> tasks;
 
     public Integer getId() {
