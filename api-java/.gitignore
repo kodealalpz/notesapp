@@ -1,0 +1,61 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos generados por el IDE
+/.idea/
+/*.iml
+*.swp
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA
+/out/
+/*.ipr
+/*.iws
+/.idea/
+/target/
+/*.log
+/*.tmp
+*.orig
+
+# Maven
+/log/
+/target/
+/build/
+
+# Gradle
+/.gradle/
+/build/
+/.gradle/
+/*.lock
+!gradle-wrapper.jar
+
+# Logs y configuración temporal
+*.log
+*.tmp
+*.bak
+*.swp
+*.lock
+*~
+*.env
+.env
+
+# Archivos del sistema
+*.class
+*.war
+*.jar
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
+
+# Archivos de test
+/test-output/
+reports/
+
+# Spring Boot
+/hs_err_pid*
