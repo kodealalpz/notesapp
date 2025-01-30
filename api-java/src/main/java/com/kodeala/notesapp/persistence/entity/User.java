@@ -1,13 +1,26 @@
 package com.kodeala.notesapp.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "username"})})
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +32,11 @@ public class User {
     private String email;
     private String password;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
+    @CreationTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -31,83 +46,28 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Storage> images;
 
-    public Integer getId() {
-        return id;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(("user")));
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
-    }
-
-    public List<Storage> getImages() {
-        return images;
-    }
-
-    public void setImages(List<Storage> images) {
-        this.images = images;
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 package com.kodeala.notesapp.domain.repository;
 
-import com.kodeala.notesapp.domain.dto.UserDTO;
+import com.kodeala.notesapp.domain.dto.request.RegisterRequest;
+import com.kodeala.notesapp.domain.dto.response.UserResponse;
 import com.kodeala.notesapp.persistence.crud.UserCrudRepository;
 import com.kodeala.notesapp.persistence.entity.User;
 import com.kodeala.notesapp.persistence.mapper.UserMapper;
@@ -16,18 +17,17 @@ public class UserRepository {
     @Autowired
     private UserCrudRepository userCrudRepository;
 
-    public List<UserDTO> getAll() {
+    public List<UserResponse> getAll() {
 
         return UserMapper.toUsersDTO((List<User>) userCrudRepository.findAll());
     }
 
-    public Optional<User> getByEmail(String email) {
-        // TODO: Map the data
-        return userCrudRepository.findByEmail(email);
-    };
+    public Optional<UserResponse> getByEmail(String email) {
+        return userCrudRepository.findByEmail(email)
+                .map(UserMapper::toUserDTO);
+    }
 
     public Optional<User> getByUsername(String username) {
-        // TODO: Map the data
         return userCrudRepository.findByUsername(username);
     }
 

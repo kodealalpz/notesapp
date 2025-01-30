@@ -1,12 +1,15 @@
 package com.kodeala.notesapp.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "groups")
+@Data
 public class Group {
 
     @Id
@@ -24,10 +27,12 @@ public class Group {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @CreationTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne
@@ -36,76 +41,4 @@ public class Group {
 
     @OneToMany(mappedBy = "group")
     private List<Task> tasks;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getTotalTasks() {
-        return totalTasks;
-    }
-
-    public void setTotalTasks(Integer totalTasks) {
-        this.totalTasks = totalTasks;
-    }
-
-    public Integer getTasksCompleted() {
-        return tasksCompleted;
-    }
-
-    public void setTasksCompleted(Integer tasksCompleted) {
-        this.tasksCompleted = tasksCompleted;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
 }

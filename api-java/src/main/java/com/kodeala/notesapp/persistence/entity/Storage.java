@@ -1,11 +1,14 @@
 package com.kodeala.notesapp.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "storage")
+@Data
 public class Storage {
 
     @Id
@@ -27,85 +30,15 @@ public class Storage {
     @Column(name = "uploaded_by")
     private Integer uploadedBy;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @CreationTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "uploaded_by", insertable = false, updatable = false)
     private User user;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public Integer getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(Integer fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public Integer getUploadedBy() {
-        return uploadedBy;
-    }
-
-    public void setUploadedBy(Integer uploadedBy) {
-        this.uploadedBy = uploadedBy;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }
