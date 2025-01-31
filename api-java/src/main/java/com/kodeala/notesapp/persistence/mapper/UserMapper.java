@@ -30,9 +30,8 @@ public class UserMapper {
     public static List<UserResponse> toUsersDTO(List<User> users) {
         List<UserResponse> usersDTO = new ArrayList<>();
 
-        users.forEach(user -> {
-            usersDTO.add(UserMapper.toUserDTO(user));
-        });
+        users.forEach(user ->
+            usersDTO.add(UserMapper.toUserDTO(user)));
 
         return usersDTO;
     }
