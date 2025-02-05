@@ -1,4 +1,4 @@
-package com.kodeala.notesapp.web;
+package com.kodeala.notesapp.web.exception;
 
 import com.kodeala.notesapp.domain.dto.response.ApiResponse;
 import org.springframework.http.HttpStatus;
