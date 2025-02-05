@@ -15,12 +15,20 @@ public class GroupRepository {
     @Autowired
     private GroupCrudRepository groupCrudRepository;
 
-    public List<Group> getAllByUsername(int userId) {
+    public List<Group> getAllByUserId(int userId) {
         return groupCrudRepository.findByUserId(userId)
                 .orElseGet(ArrayList::new);
     }
 
     public Optional<Group> getByGroupId(int groupId) {
         return groupCrudRepository.findById(groupId);
+    }
+
+    public Group create(Group group) {
+        return groupCrudRepository.save(group);
+    }
+
+    public void delete(int groupId) {
+        groupCrudRepository.deleteById(groupId);
     }
 }

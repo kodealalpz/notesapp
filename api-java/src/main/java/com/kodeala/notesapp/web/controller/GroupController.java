@@ -1,14 +1,12 @@
 package com.kodeala.notesapp.web.controller;
 
+import com.kodeala.notesapp.domain.dto.request.GroupRequest;
 import com.kodeala.notesapp.domain.dto.response.GroupResponse;
 import com.kodeala.notesapp.domain.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -31,8 +29,21 @@ public class GroupController {
     @GetMapping
     public ResponseEntity<List<GroupResponse>> getGroups() {
         return new ResponseEntity<>(
-                groupService.getGroups(1),
+                groupService.getGroups(),
                 HttpStatus.OK
         );
+    }
+
+    @PostMapping
+    public ResponseEntity<GroupResponse> createGroup(@RequestBody GroupRequest groupRequest) {
+        return new ResponseEntity<>(
+                groupService.createGroup(groupRequest),
+                HttpStatus.CREATED
+        );
+    }
+
+    @DeleteMapping("/{groupId}")
+    public ResponseEntity<Boolean> deleteGroup(@PathVariable("groupId") int groupId) {
+        return new ResponseEntity<>(groupService.deleteGroup(groupId), HttpStatus.OK);
     }
 }
