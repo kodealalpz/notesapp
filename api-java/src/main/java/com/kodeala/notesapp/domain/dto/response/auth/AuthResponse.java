@@ -8,5 +8,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class AuthResponse {
+    private String status;
+    private String message;
     private String token;
+    private String refreshToken;
 }

@@ -32,6 +32,9 @@ public class User implements UserDetails {
     private String email;
     private String password;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;

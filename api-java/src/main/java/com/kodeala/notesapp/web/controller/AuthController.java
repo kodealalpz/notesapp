@@ -1,22 +1,17 @@
 package com.kodeala.notesapp.web.controller;
 
-import com.kodeala.notesapp.domain.dto.request.LoginRequest;
-import com.kodeala.notesapp.domain.dto.request.RegisterRequest;
+import com.kodeala.notesapp.domain.dto.request.auth.LoginRequest;
+import com.kodeala.notesapp.domain.dto.request.auth.RefreshTokenRequest;
+import com.kodeala.notesapp.domain.dto.request.auth.RegisterRequest;
 import com.kodeala.notesapp.domain.dto.response.ApiResponse;
 import com.kodeala.notesapp.domain.dto.response.auth.AuthResponse;
 import com.kodeala.notesapp.domain.dto.response.UserResponse;
-import com.kodeala.notesapp.domain.security.jwt.JwtService;
 import com.kodeala.notesapp.domain.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,7 +40,12 @@ public class AuthController {
         return new ResponseEntity<>(authService.login(request), HttpStatus.OK);
     }
 
-//    @PostMapping("/refresh")
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        AuthResponse response = authService.refreshToken(request);
+        return ResponseEntity.ok(response);
+    }
+
 //    @PostMapping("/logout")
 //    @GetMapping("/me")
 }

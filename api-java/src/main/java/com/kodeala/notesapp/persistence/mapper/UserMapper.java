@@ -1,12 +1,11 @@
 package com.kodeala.notesapp.persistence.mapper;
 
-import com.kodeala.notesapp.domain.dto.request.RegisterRequest;
+import com.kodeala.notesapp.domain.dto.request.auth.RegisterRequest;
 import com.kodeala.notesapp.domain.dto.response.UserResponse;
 import com.kodeala.notesapp.persistence.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserMapper {
 

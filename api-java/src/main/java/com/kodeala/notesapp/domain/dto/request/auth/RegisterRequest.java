@@ -1,4 +1,4 @@
-package com.kodeala.notesapp.domain.dto.request;
+package com.kodeala.notesapp.domain.dto.request.auth;
 
 import lombok.Data;
 

@@ -17,6 +17,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private static final String SECRET_KEY = "Yb5zrM8A3cBSz2pUe9Q5UptimTpKbZjfdapuJYUJfdnafurjda549404";
+    private static final long TOKEN_EXPIRATION = 1000 * 60 * 60 * 24;
+    private static final long REFRESH_EXPIRATION = 1000 * 60 * 60 * 24 * 7;
 
     public String getToken(UserDetails user) {
         return getToken(new HashMap<>(), user);
@@ -27,9 +29,30 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 day
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION)) // 1 day
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String getRefreshToken(UserDetails user) { return getRefreshToken(new HashMap<>(), user); }
+
+    public String getRefreshToken(Map<String, Object> extraClaims, UserDetails user) {
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION))
+                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String extractUsername(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     private Key getKey() {
