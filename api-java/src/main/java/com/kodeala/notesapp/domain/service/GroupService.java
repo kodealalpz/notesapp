@@ -7,11 +7,12 @@ import com.kodeala.notesapp.domain.repository.UserRepository;
 import com.kodeala.notesapp.persistence.entity.Group;
 import com.kodeala.notesapp.persistence.entity.User;
 import com.kodeala.notesapp.persistence.mapper.GroupMapper;
+import com.kodeala.notesapp.web.exception.ResourceNotFoundException;
+import com.kodeala.notesapp.web.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -25,15 +26,14 @@ public class GroupService {
     public List<GroupResponse> getGroups() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof UserDetails user) {
-            Optional<User> userOpt = userRepository.getByUsername(user.getUsername());
+            User userOpt = userRepository.getByUsername(user.getUsername())
+                    .orElseThrow(() -> new ResourceNotFoundException("There is a problem with the user"));
 
-            if(userOpt.isPresent()) {
-                int userId = userOpt.get().getId();
+            int userId = userOpt.getId();
 
-                List<Group> groups = groupRepository.getAllByUserId(userId);
+            List<Group> groups = groupRepository.getAllByUserId(userId);
 
-                return GroupMapper.toGroupsDTO(groups);
-            }
+            return GroupMapper.toGroupsDTO(groups);
         }
 
         return Collections.emptyList();
@@ -42,15 +42,18 @@ public class GroupService {
     public Optional<GroupResponse> getGroup(int groupId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof UserDetails user) {
-            Optional<User> userOpt = userRepository.getByUsername(user.getUsername());
+            User userOpt = userRepository.getByUsername(user.getUsername())
+                    .orElseThrow(() -> new ResourceNotFoundException("There is a problem with the user"));
 
-            if(userOpt.isPresent()) {
-                int userId = userOpt.get().getId();
+            int userId = userOpt.getId();
 
-                return groupRepository.getByGroupId(groupId)
-                        .filter(group -> group.getUserId() == userId)
-                        .map(GroupMapper::toGroupDTO);
-            }
+            Group group = groupRepository.getByGroupId(groupId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+
+            if(group.getUserId() != userId)
+                throw new UnauthorizedException("You can't access to this resource");
+
+            return Optional.of(GroupMapper.toGroupDTO(group));
         }
 
         return Optional.empty();
@@ -59,19 +62,18 @@ public class GroupService {
     public GroupResponse createGroup(GroupRequest groupRequest) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof  UserDetails user) {
-            Optional<User> userOpt = userRepository.getByUsername((user.getUsername()));
+            User userOpt = userRepository.getByUsername((user.getUsername()))
+                    .orElseThrow(() -> new ResourceNotFoundException("There is a problem with the user"));
 
-            if(userOpt.isPresent()) {
-                int userId = userOpt.get().getId();
+            int userId = userOpt.getId();
 
-                if(userId != groupRequest.getUserId()) {
-                    throw new IllegalArgumentException();
-                }
-
-                Group group = GroupMapper.toGroup(groupRequest);
-                group.setTasks(Collections.emptyList());
-                return GroupMapper.toGroupDTO(groupRepository.create(group));
+            if(userId != groupRequest.getUserId()) {
+                throw new IllegalArgumentException("There is a problem with the user id");
             }
+
+            Group group = GroupMapper.toGroup(groupRequest);
+            group.setTasks(Collections.emptyList());
+            return GroupMapper.toGroupDTO(groupRepository.create(group));
         }
 
         return new GroupResponse();

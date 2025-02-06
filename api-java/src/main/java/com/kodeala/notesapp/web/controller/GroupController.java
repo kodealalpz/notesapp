@@ -1,13 +1,14 @@
 package com.kodeala.notesapp.web.controller;
 
 import com.kodeala.notesapp.domain.dto.request.GroupRequest;
+import com.kodeala.notesapp.domain.dto.response.ApiResponse;
 import com.kodeala.notesapp.domain.dto.response.GroupResponse;
 import com.kodeala.notesapp.domain.service.GroupService;
+import com.kodeala.notesapp.web.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -19,31 +20,44 @@ public class GroupController {
     private GroupService groupService;
 
     @GetMapping("/{groupId}")
-    public ResponseEntity<GroupResponse> getGroup(@PathVariable("groupId") int groupId) {
-        return groupService.getGroup(groupId)
-                .map(group -> new ResponseEntity<>(group, HttpStatus.OK))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT));
+    public ResponseEntity<ApiResponse<GroupResponse>> getGroup(@PathVariable("groupId") int groupId) {
+        GroupResponse groupResponse = groupService.getGroup(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
 
+        return ResponseEntity.ok(new ApiResponse<>("success", "Group found", groupResponse));
     }
 
     @GetMapping
-    public ResponseEntity<List<GroupResponse>> getGroups() {
-        return new ResponseEntity<>(
-                groupService.getGroups(),
-                HttpStatus.OK
-        );
+    public ResponseEntity<ApiResponse<List<GroupResponse>>> getGroups() {
+        return ResponseEntity.ok(new ApiResponse<>(
+           "success",
+           "Groups found",
+           groupService.getGroups()
+        ));
     }
 
     @PostMapping
-    public ResponseEntity<GroupResponse> createGroup(@RequestBody GroupRequest groupRequest) {
-        return new ResponseEntity<>(
-                groupService.createGroup(groupRequest),
-                HttpStatus.CREATED
-        );
+    public ResponseEntity<ApiResponse<GroupResponse>> createGroup(@RequestBody GroupRequest groupRequest) {
+        GroupResponse groupResponse = groupService.createGroup(groupRequest);
+        return new ResponseEntity<>(new ApiResponse<>(
+                "success",
+                "Group created",
+                groupResponse
+        ), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{groupId}")
-    public ResponseEntity<Boolean> deleteGroup(@PathVariable("groupId") int groupId) {
-        return new ResponseEntity<>(groupService.deleteGroup(groupId), HttpStatus.OK);
+    public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable("groupId") int groupId) {
+        if(groupService.deleteGroup(groupId)) {
+            return ResponseEntity.ok(new ApiResponse<>(
+                    "success",
+                    "Group deleted",
+                    null
+            ));
+        }else{
+            return new ResponseEntity<>(
+                    new ApiResponse<>("error", "Group not found to delete", null),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 }
