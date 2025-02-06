@@ -9,6 +9,8 @@ import com.kodeala.notesapp.persistence.entity.Group;
 import com.kodeala.notesapp.persistence.entity.Task;
 import com.kodeala.notesapp.persistence.entity.User;
 import com.kodeala.notesapp.persistence.mapper.TaskMapper;
+import com.kodeala.notesapp.web.exception.ResourceNotFoundException;
+import com.kodeala.notesapp.web.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,20 +30,19 @@ public class TaskService {
     public Optional<TaskResponse> getTask(int taskId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof UserDetails user) {
-            Optional<User> userOpt = userRepository.getByUsername(user.getUsername());
-            Optional<Task> task = taskRepository.getByTaskId(taskId);
+            User userOpt = userRepository.getByUsername(user.getUsername())
+                    .orElseThrow(() -> new ResourceNotFoundException("There is a problem with the user"));
+            Task task = taskRepository.getByTaskId(taskId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
-            if(userOpt.isPresent() && task.isPresent()){
-                int userId = userOpt.get().getId();
-                Optional<Group> group = groupRepository.getByGroupId(task.get().getGroupId());
+            int userId = userOpt.getId();
+            Group group = groupRepository.getByGroupId(task.getGroupId())
+                    .orElseThrow(() -> new ResourceNotFoundException("There is a problem with the task group"));
 
-                if(group.isPresent()) {
-                    if(userId != group.get().getUserId())
-                        throw new IllegalArgumentException();
+            if(userId != group.getUserId())
+                throw new UnauthorizedException("You can't access to this resource");
 
-                    return task.map(TaskMapper::toTaskDTO);
-                }
-            }
+            return Optional.of(TaskMapper.toTaskDTO(task));
         }
 
         return Optional.empty();
@@ -50,21 +51,21 @@ public class TaskService {
     public TaskResponse createTask(TaskRequest taskRequest) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof UserDetails user) {
-            Optional<User> userOpt = userRepository.getByUsername(user.getUsername());
-            Optional<Group> groupOpt = groupRepository.getByGroupId(taskRequest.getGroupId());
+            User userOpt = userRepository.getByUsername(user.getUsername())
+                    .orElseThrow(() -> new ResourceNotFoundException("There is a problem with the user"));
+            Group groupOpt = groupRepository.getByGroupId(taskRequest.getGroupId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
 
-            if(userOpt.isPresent() && groupOpt.isPresent()) {
-                int userId = userOpt.get().getId();
-                int userId2 = groupOpt.get().getUserId();
+            int userId = userOpt.getId();
+            int userId2 = groupOpt.getUserId();
 
-                if(userId != userId2) {
-                    throw new IllegalArgumentException();
-                }
-
-                Task newTask = TaskMapper.toTask(taskRequest);
-                newTask.setChecked(false);
-                return TaskMapper.toTaskDTO(taskRepository.create(newTask));
+            if(userId != userId2) {
+                throw new IllegalArgumentException("There is a problem with user reference");
             }
+
+            Task newTask = TaskMapper.toTask(taskRequest);
+            newTask.setChecked(false);
+            return TaskMapper.toTaskDTO(taskRepository.create(newTask));
         }
 
         return new TaskResponse();

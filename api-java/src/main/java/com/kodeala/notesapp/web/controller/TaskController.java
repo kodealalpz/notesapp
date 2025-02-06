@@ -1,8 +1,10 @@
 package com.kodeala.notesapp.web.controller;
 
 import com.kodeala.notesapp.domain.dto.request.TaskRequest;
+import com.kodeala.notesapp.domain.dto.response.ApiResponse;
 import com.kodeala.notesapp.domain.dto.response.TaskResponse;
 import com.kodeala.notesapp.domain.service.TaskService;
+import com.kodeala.notesapp.web.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,22 +19,36 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<TaskResponse> getTask(@PathVariable("taskId") int taskId) {
-        return taskService.getTask(taskId)
-                .map(task -> new ResponseEntity<>(task, HttpStatus.OK))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT));
+    public ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("taskId") int taskId) {
+        TaskResponse taskResponse = taskService.getTask(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+
+        return ResponseEntity.ok(new ApiResponse<>("success", "Task found", taskResponse));
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest) {
-        return new ResponseEntity<>(
-                taskService.createTask(taskRequest),
-                HttpStatus.CREATED
-        );
+    public ResponseEntity<ApiResponse<TaskResponse>> createTask(@RequestBody TaskRequest taskRequest) {
+        TaskResponse taskResponse = taskService.createTask(taskRequest);
+        return new ResponseEntity<>(new ApiResponse<>(
+                "success",
+                "Task created",
+                taskResponse
+        ), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Boolean> deleteGroup(@PathVariable("taskId") int taskId) {
-        return new ResponseEntity<>(taskService.deleteTask(taskId), HttpStatus.OK);
+    public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable("taskId") int taskId) {
+        if(taskService.deleteTask(taskId)) {
+            return ResponseEntity.ok(new ApiResponse<>(
+                    "success",
+                    "Task deleted",
+                    null
+            ));
+        }else{
+            return new ResponseEntity<>(
+                    new ApiResponse<>("error", "Task not found to delete", null),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
     }
 }
