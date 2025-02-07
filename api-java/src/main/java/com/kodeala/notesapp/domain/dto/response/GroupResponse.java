@@ -8,5 +8,7 @@ import java.util.List;
 public class GroupResponse {
     private Integer id;
     private String name;
+    private Integer totalTasks;
+    private Integer completedTasks;
     private List<TaskResponse> tasks;
 }

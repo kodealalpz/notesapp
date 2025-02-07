@@ -46,6 +46,16 @@ public class GroupController {
         ), HttpStatus.CREATED);
     }
 
+    @PutMapping("/{groupId}")
+    public ResponseEntity<ApiResponse<GroupResponse>> updateGroup(@PathVariable("groupId") int groupId, @RequestBody GroupRequest request) {
+        GroupResponse groupResponse = groupService.updateGroup(groupId, request);
+        return ResponseEntity.ok(new ApiResponse<>(
+                "success",
+                "Group updated successfully",
+                groupResponse
+        ));
+    }
+
     @DeleteMapping("/{groupId}")
     public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable("groupId") int groupId) {
         if(groupService.deleteGroup(groupId)) {

@@ -36,6 +36,16 @@ public class TaskController {
         ), HttpStatus.CREATED);
     }
 
+    @PutMapping("/{taskId}")
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@PathVariable int taskId, @RequestBody TaskRequest request) {
+        TaskResponse taskResponse = taskService.updateTask(taskId, request);
+        return ResponseEntity.ok(new ApiResponse<>(
+                "success",
+                "Task updated successfully",
+                taskResponse
+        ));
+    }
+
     @DeleteMapping("/{taskId}")
     public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable("taskId") int taskId) {
         if(taskService.deleteTask(taskId)) {

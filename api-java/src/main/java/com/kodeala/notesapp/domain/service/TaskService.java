@@ -71,6 +71,20 @@ public class TaskService {
         return new TaskResponse();
     }
 
+    public TaskResponse updateTask(int taskId, TaskRequest request) {
+        TaskResponse taskResponse = getTask(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Error while updating the task"));
+        Task task = taskRepository.getByTaskId(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+        task.setDescription(request.getDescription());
+        task.setChecked(request.isChecked());
+
+        taskRepository.create(task);
+
+        return TaskMapper.toTaskDTO(task);
+    }
+
     public boolean deleteTask(int taskId) {
         return getTask(taskId).map(task -> {
             taskRepository.delete(taskId);

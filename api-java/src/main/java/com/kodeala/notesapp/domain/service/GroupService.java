@@ -5,6 +5,7 @@ import com.kodeala.notesapp.domain.dto.response.GroupResponse;
 import com.kodeala.notesapp.domain.repository.GroupRepository;
 import com.kodeala.notesapp.domain.repository.UserRepository;
 import com.kodeala.notesapp.persistence.entity.Group;
+import com.kodeala.notesapp.persistence.entity.Task;
 import com.kodeala.notesapp.persistence.entity.User;
 import com.kodeala.notesapp.persistence.mapper.GroupMapper;
 import com.kodeala.notesapp.web.exception.ResourceNotFoundException;
@@ -53,6 +54,10 @@ public class GroupService {
             if(group.getUserId() != userId)
                 throw new UnauthorizedException("You can't access to this resource");
 
+            // Calculate the total task and the completed ones
+            group.setTotalTasks(group.getTasks().size());
+            group.setTasksCompleted(group.getTasks().stream().filter(Task::getChecked).toList().size());
+
             return Optional.of(GroupMapper.toGroupDTO(group));
         }
 
@@ -77,6 +82,19 @@ public class GroupService {
         }
 
         return new GroupResponse();
+    }
+
+    public GroupResponse updateGroup(int groupId, GroupRequest groupRequest) {
+        GroupResponse groupResponse = getGroup(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Error while updating group"));
+        Group group = groupRepository.getByGroupId(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+
+        group.setName(groupRequest.getName());
+
+        groupRepository.create(group);
+
+        return GroupMapper.toGroupDTO(group);
     }
 
     public boolean deleteGroup(int groupId) {

@@ -30,6 +30,7 @@ public class TaskMapper {
     public static Task toTask(TaskRequest taskRequest) {
         return Task.builder()
                 .description(taskRequest.getDescription())
+                .checked(taskRequest.isChecked())
                 .groupId(taskRequest.getGroupId())
                 .build();
     }

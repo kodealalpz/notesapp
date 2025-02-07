@@ -15,6 +15,8 @@ public class GroupMapper {
 
         groupDTO.setId(group.getId());
         groupDTO.setName(group.getName());
+        groupDTO.setTotalTasks(group.getTotalTasks());
+        groupDTO.setCompletedTasks(group.getTasksCompleted());
         groupDTO.setTasks(
                 group.getTasks().stream()
                         .map(TaskMapper::toTaskDTO)
